@@ -5,18 +5,44 @@ void main() {
   runApp(const TodoListApp());
 }
 
-class TodoListApp extends StatelessWidget {
+class TodoListApp extends StatefulWidget {
   const TodoListApp({super.key});
+
+  @override
+  State<TodoListApp> createState() => _TodoListAppState();
+}
+
+class _TodoListAppState extends State<TodoListApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  void _toggleTheme() {
+    setState(() {
+      _themeMode =
+          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Todo List App',
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
+      themeMode: _themeMode,
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        brightness: Brightness.light,
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        brightness: Brightness.dark,
+      ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const TodoHomePage(),
+        '/':
+            (context) => TodoHomePage(
+              toggleTheme: _toggleTheme,
+              isDarkMode: _themeMode == ThemeMode.dark,
+            ),
         '/second': (context) => const SecondPage(),
       },
     );
@@ -24,7 +50,14 @@ class TodoListApp extends StatelessWidget {
 }
 
 class TodoHomePage extends StatefulWidget {
-  const TodoHomePage({super.key});
+  final VoidCallback toggleTheme;
+  final bool isDarkMode;
+
+  const TodoHomePage({
+    super.key,
+    required this.toggleTheme,
+    required this.isDarkMode,
+  });
 
   @override
   State<TodoHomePage> createState() => _TodoHomePageState();
@@ -88,6 +121,13 @@ class _TodoHomePageState extends State<TodoHomePage> {
         title: const Text('Daftar Tugas'),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: Icon(
+              widget.isDarkMode ? Icons.wb_sunny : Icons.nightlight_round,
+            ),
+            tooltip: 'Ganti Mode Tema',
+            onPressed: widget.toggleTheme,
+          ),
           IconButton(
             icon: const Icon(Icons.arrow_forward),
             tooltip: 'Halaman Kedua',
